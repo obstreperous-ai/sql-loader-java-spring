@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -21,9 +22,13 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+/**
+ * Unit tests for SqlExecutor.
+ * Tests focus on the executeSqlFile method directly without running the full CLI.
+ */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Testcontainers
-class SqlLoaderRunnerTest {
+class SqlExecutorTest {
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
@@ -38,8 +43,11 @@ class SqlLoaderRunnerTest {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
 
-    @Autowired
+    @MockBean
     private SqlLoaderRunner sqlLoaderRunner;
+
+    @Autowired
+    private SqlExecutor sqlExecutor;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -58,7 +66,7 @@ class SqlLoaderRunnerTest {
         Files.writeString(sqlFile, sql);
 
         // When: SQL file is executed
-        sqlLoaderRunner.executeSqlFile(sqlFile.toString());
+        sqlExecutor.executeSqlFile(sqlFile.toString());
 
         // Then: Table should be created
         List<Map<String, Object>> tables = jdbcTemplate.queryForList(
@@ -87,7 +95,7 @@ class SqlLoaderRunnerTest {
         Files.writeString(sqlFile, sql);
 
         // When: SQL file is executed
-        sqlLoaderRunner.executeSqlFile(sqlFile.toString());
+        sqlExecutor.executeSqlFile(sqlFile.toString());
 
         // Then: Data should be inserted
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM test_products", Integer.class);
@@ -101,7 +109,7 @@ class SqlLoaderRunnerTest {
         Files.writeString(sqlFile, "");
 
         // When: SQL file is executed
-        sqlLoaderRunner.executeSqlFile(sqlFile.toString());
+        sqlExecutor.executeSqlFile(sqlFile.toString());
 
         // Then: No exception should be thrown (handled gracefully)
     }
@@ -113,7 +121,7 @@ class SqlLoaderRunnerTest {
         Files.writeString(sqlFile, "   \n\n   \t   ");
 
         // When: SQL file is executed
-        sqlLoaderRunner.executeSqlFile(sqlFile.toString());
+        sqlExecutor.executeSqlFile(sqlFile.toString());
 
         // Then: No exception should be thrown
     }
@@ -124,7 +132,7 @@ class SqlLoaderRunnerTest {
         String nonExistentPath = "/tmp/nonexistent.sql";
 
         // When/Then: Executing should throw IOException
-        assertThatThrownBy(() -> sqlLoaderRunner.executeSqlFile(nonExistentPath))
+        assertThatThrownBy(() -> sqlExecutor.executeSqlFile(nonExistentPath))
                 .isInstanceOf(IOException.class)
                 .hasMessageContaining("SQL file not found");
     }
@@ -136,7 +144,7 @@ class SqlLoaderRunnerTest {
         Files.writeString(sqlFile, "INVALID SQL STATEMENT;");
 
         // When/Then: Executing should throw SQLException
-        assertThatThrownBy(() -> sqlLoaderRunner.executeSqlFile(sqlFile.toString()))
+        assertThatThrownBy(() -> sqlExecutor.executeSqlFile(sqlFile.toString()))
                 .isInstanceOf(SQLException.class);
     }
 }

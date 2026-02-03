@@ -2,6 +2,7 @@ package ai.obstreperous.sqlloader;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -10,7 +11,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+/**
+ * Integration test for the main Spring Boot application.
+ * Verifies that the application context loads successfully.
+ */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Testcontainers
 class SqlLoaderApplicationTest {
 
@@ -26,6 +31,9 @@ class SqlLoaderApplicationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
     }
+
+    @MockBean
+    private SqlLoaderRunner sqlLoaderRunner;
 
     @Test
     void contextLoads() {

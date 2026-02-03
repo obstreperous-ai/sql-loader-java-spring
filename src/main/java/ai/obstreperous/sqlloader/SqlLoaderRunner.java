@@ -6,15 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 /**
  * CLI runner that executes SQL scripts from command line arguments.
  * 
@@ -27,7 +18,7 @@ public class SqlLoaderRunner implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(SqlLoaderRunner.class);
 
     @Autowired
-    private DataSource dataSource;
+    private SqlExecutor sqlExecutor;
 
     @Override
     public void run(String... args) throws Exception {
@@ -46,43 +37,13 @@ public class SqlLoaderRunner implements CommandLineRunner {
         logger.info("Starting SQL loader for file: {}", sqlFilePath);
 
         try {
-            executeSqlFile(sqlFilePath);
+            sqlExecutor.executeSqlFile(sqlFilePath);
             logger.info("SQL script executed successfully");
             System.exit(0);
         } catch (Exception e) {
             logger.error("Failed to execute SQL script", e);
             System.err.println("Error: " + e.getMessage());
             System.exit(1);
-        }
-    }
-
-    /**
-     * Executes SQL commands from a file.
-     *
-     * @param sqlFilePath path to the SQL file
-     * @throws IOException if file cannot be read
-     * @throws SQLException if SQL execution fails
-     */
-    public void executeSqlFile(String sqlFilePath) throws IOException, SQLException {
-        Path path = Paths.get(sqlFilePath);
-        
-        if (!Files.exists(path)) {
-            throw new IOException("SQL file not found: " + sqlFilePath);
-        }
-
-        String sqlContent = Files.readString(path);
-        
-        if (sqlContent.trim().isEmpty()) {
-            logger.warn("SQL file is empty: {}", sqlFilePath);
-            return;
-        }
-
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-            
-            logger.debug("Executing SQL from: {}", sqlFilePath);
-            statement.execute(sqlContent);
-            logger.debug("SQL execution completed");
         }
     }
 }
