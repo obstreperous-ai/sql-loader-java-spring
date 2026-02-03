@@ -21,6 +21,16 @@ A lean CLI utility in Java using Spring Boot, Maven, and JDBC that runs SQL data
 - ✅ Built for Kubernetes/container environments
 - ✅ Comprehensive test coverage with Testcontainers
 
+## Security Considerations
+
+**Important:** This tool executes SQL files as-is without additional sanitization. Only use SQL files from trusted sources. It is designed for controlled environments like Kubernetes init containers where SQL scripts are provided by trusted configuration management systems (ConfigMaps, Secrets, etc.).
+
+For production use:
+- Store SQL files in ConfigMaps or as part of your container image
+- Use read-only file systems where possible
+- Apply least-privilege database user permissions
+- Audit all SQL scripts before deployment
+
 ## Requirements
 
 - Java 17 or later
@@ -195,13 +205,14 @@ task verify
 │   ├── main/
 │   │   ├── java/ai/obstreperous/sqlloader/
 │   │   │   ├── SqlLoaderApplication.java  # Main Spring Boot app
-│   │   │   └── SqlLoaderRunner.java       # CLI runner
+│   │   │   ├── SqlLoaderRunner.java       # CLI runner
+│   │   │   └── SqlExecutor.java           # SQL execution service
 │   │   └── resources/
 │   │       └── application.properties
 │   └── test/
 │       └── java/ai/obstreperous/sqlloader/
-│           ├── SqlLoaderApplicationTest.java
-│           └── SqlLoaderRunnerTest.java
+│           ├── SqlLoaderApplicationTest.java  # Integration test
+│           └── SqlExecutorTest.java           # Unit tests for SQL execution
 ├── Taskfile.yml            # Task automation
 ├── pom.xml                 # Maven configuration
 └── README.md

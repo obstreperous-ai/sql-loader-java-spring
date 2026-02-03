@@ -17,6 +17,11 @@ import java.sql.Statement;
 /**
  * Service for executing SQL scripts.
  * This service handles the core business logic of reading and executing SQL files.
+ * 
+ * SECURITY NOTE: SQL files are executed as-is without additional sanitization.
+ * Only execute SQL files from trusted sources. This tool is designed for 
+ * controlled environments like Kubernetes init containers where SQL scripts
+ * are provided by trusted configuration management systems.
  */
 @Service
 public class SqlExecutor {

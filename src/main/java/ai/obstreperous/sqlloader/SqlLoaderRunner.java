@@ -30,7 +30,6 @@ public class SqlLoaderRunner implements CommandLineRunner {
             System.err.println("  SPRING_DATASOURCE_USERNAME (or spring.datasource.username)");
             System.err.println("  SPRING_DATASOURCE_PASSWORD (or spring.datasource.password)");
             System.exit(1);
-            return;
         }
 
         String sqlFilePath = args[0];
