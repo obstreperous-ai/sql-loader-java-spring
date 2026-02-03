@@ -1,0 +1,92 @@
+version: '3'
+
+vars:
+  APP_NAME: sql-loader
+  VERSION: 0.1.0-SNAPSHOT
+
+tasks:
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  deps:
+    desc: "Download Maven dependencies"
+    cmds:
+      - mvn dependency:go-offline
+
+  clean:
+    desc: "Clean build artifacts"
+    cmds:
+      - mvn clean
+
+  compile:
+    desc: "Compile the application"
+    cmds:
+      - mvn compile
+
+  test:
+    desc: "Run unit tests"
+    cmds:
+      - mvn test
+
+  verify:
+    desc: "Run tests and integration tests"
+    cmds:
+      - mvn verify
+
+  package:
+    desc: "Package the application as an executable JAR"
+    cmds:
+      - mvn clean package -DskipTests
+
+  build:
+    desc: "Build and test the application"
+    cmds:
+      - mvn clean install
+
+  run:
+    desc: "Run the application (requires SQL_FILE argument)"
+    cmds:
+      - java -jar target/{{.APP_NAME}}-{{.VERSION}}.jar {{.SQL_FILE}}
+    vars:
+      SQL_FILE: '{{.SQL_FILE | default "example.sql"}}'
+
+  run-example:
+    desc: "Run the application with example SQL file"
+    cmds:
+      - task: package
+      - echo "CREATE TABLE example (id SERIAL PRIMARY KEY, name VARCHAR(100));" > /tmp/example.sql
+      - |
+        SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/testdb \
+        SPRING_DATASOURCE_USERNAME=testuser \
+        SPRING_DATASOURCE_PASSWORD=testpass \
+        java -jar target/{{.APP_NAME}}-{{.VERSION}}.jar /tmp/example.sql
+
+  format:
+    desc: "Format code (if formatter is configured)"
+    cmds:
+      - echo "Code formatting not yet configured"
+
+  lint:
+    desc: "Run linter (if configured)"
+    cmds:
+      - echo "Linting not yet configured"
+
+  docker-build:
+    desc: "Build Docker image"
+    cmds:
+      - docker build -t {{.APP_NAME}}:{{.VERSION}} .
+
+  help:
+    desc: "Show help for the SQL Loader"
+    cmds:
+      - echo "SQL Loader - A lean CLI utility for running SQL scripts"
+      - echo ""
+      - echo "Usage:"
+      - echo "  java -jar target/{{.APP_NAME}}-{{.VERSION}}.jar <sql-file-path>"
+      - echo ""
+      - echo "Environment Variables:"
+      - echo "  SPRING_DATASOURCE_URL      - Database JDBC URL"
+      - echo "  SPRING_DATASOURCE_USERNAME - Database username"
+      - echo "  SPRING_DATASOURCE_PASSWORD - Database password"
