@@ -32,4 +32,4 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Install dependencies with Maven
-        run: mvn dependency:resolve
+        run: mvn dependency:go-offline
