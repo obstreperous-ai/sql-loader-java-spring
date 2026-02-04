@@ -2,7 +2,7 @@ package ai.obstreperous.sqlloader;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -32,7 +32,7 @@ class SqlLoaderApplicationTest {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
 
-    @MockBean
+    @MockitoBean
     private SqlLoaderRunner sqlLoaderRunner;
 
     @Test
