@@ -56,6 +56,29 @@ This is a lean CLI utility in Java using Spring Boot, Maven, and JDBC. The tool 
 - Add comments only when code intent is not clear
 - Avoid code duplication
 
+#### Immutability and Final
+- **Always use `final` for fields** whenever possible to ensure immutability
+- **Always use `final` for method parameters** to prevent reassignment
+- **Always use `final` for local variables** whenever possible to improve readability and prevent bugs
+- Immutability reduces bugs and makes code easier to reason about
+
+#### Dependency Injection
+- **Prefer constructor injection over field injection** (avoid `@Autowired` on fields)
+- Constructor injection makes dependencies explicit and enables immutability
+- Makes classes easier to test and understand
+
+#### Code Quality and Reflection
+- **Always reflect after tests pass** - look for opportunities to improve
+- Apply DRY (Don't Repeat Yourself) principles to eliminate duplication
+- Refactor for readability - code should be self-documenting
+- Prefer functional and declarative approaches over imperative code where appropriate
+
+#### Lightweight and Functional Style
+- Favor a minimal, lightweight, functional idiomatic style
+- Use Java's functional features (lambdas, streams) when they improve clarity
+- Keep classes small and focused on a single responsibility
+- Avoid over-engineering - simple solutions are preferred
+
 ## Architecture Guidelines
 
 ### CLI Design

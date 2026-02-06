@@ -2,7 +2,6 @@ package ai.obstreperous.sqlloader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -28,8 +27,11 @@ public class SqlExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlExecutor.class);
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
+
+    public SqlExecutor(final DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     /**
      * Executes SQL commands from a file.
@@ -38,22 +40,22 @@ public class SqlExecutor {
      * @throws IOException if file cannot be read
      * @throws SQLException if SQL execution fails
      */
-    public void executeSqlFile(String sqlFilePath) throws IOException, SQLException {
-        Path path = Paths.get(sqlFilePath);
+    public void executeSqlFile(final String sqlFilePath) throws IOException, SQLException {
+        final Path path = Paths.get(sqlFilePath);
         
         if (!Files.exists(path)) {
             throw new IOException("SQL file not found: " + sqlFilePath);
         }
 
-        String sqlContent = Files.readString(path);
+        final String sqlContent = Files.readString(path);
         
         if (sqlContent.trim().isEmpty()) {
             logger.warn("SQL file is empty: {}", sqlFilePath);
             return;
         }
 
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
+        try (final Connection connection = dataSource.getConnection();
+             final Statement statement = connection.createStatement()) {
             
             logger.debug("Executing SQL from: {}", sqlFilePath);
             statement.execute(sqlContent);
