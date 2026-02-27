@@ -46,7 +46,7 @@ jobs:
           fail-on-error: false
 
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sql-loader-jar
           path: target/*.jar
@@ -75,7 +75,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Upload executable JAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sql-loader-executable
           path: target/sql-loader-*.jar
